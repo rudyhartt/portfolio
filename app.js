@@ -1,5 +1,6 @@
 'use strict';
 const projects = window.PORTFOLIO_PROJECTS || [];
+const detailProjects = window.LOVE_PROJECT ? [...projects, window.LOVE_PROJECT] : projects;
 const grid = document.querySelector('#project-grid');
 const projectDialog = document.querySelector('#project-dialog');
 const lightbox = document.querySelector('#lightbox');
@@ -8,7 +9,13 @@ let currentProject = null;
 let currentImage = 0;
 let lastFocus = null;
 const escapeHTML = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const imgTag = (art, thumbnail = false) => `<img src="${escapeHTML(thumbnail ? art.thumb || art.src : art.src)}" alt="${escapeHTML(art.alt)}" width="${art.width}" height="${art.height}"${art.background ? ` style="background-color:${escapeHTML(art.background)}"` : ''} loading="lazy" decoding="async">`;
+const imgTag = (art, thumbnail = false) => {
+  if (art.crop) {
+    const c = art.crop;
+    return `<span class="image-crop" style="aspect-ratio:${c.width}/${c.height};--image-width:${100*c.sourceWidth/c.width}%;--image-left:${-100*c.x/c.width}%;--image-top:${-100*c.y/c.height}%"><img src="${escapeHTML(art.src)}" alt="${escapeHTML(art.alt)}" width="${c.sourceWidth}" height="${c.sourceHeight}" loading="lazy" decoding="async"></span>`;
+  }
+  return `<img src="${escapeHTML(thumbnail ? art.thumb || art.src : art.src)}" alt="${escapeHTML(art.alt)}" width="${art.width}" height="${art.height}"${art.background ? ` style="background-color:${escapeHTML(art.background)}"` : ''} loading="lazy" decoding="async">`;
+};
 
 document.querySelector('#year').textContent = new Date().getFullYear();
 document.querySelector('#total-count').textContent = String(projects.length).padStart(2, '0');
@@ -48,7 +55,7 @@ document.querySelector('.filters').addEventListener('click', event => {
 });
 
 function showProject(id) {
-  const project = projects.find(p => p.id === id);
+  const project = detailProjects.find(p => p.id === id);
   if (!project) return;
   if (lightbox.open) lightbox.close();
   if (!projectDialog.open) lastFocus = document.activeElement;
@@ -66,14 +73,14 @@ function closeProject() {
   projectDialog.querySelectorAll('video').forEach(video => video.pause());
   if (projectDialog.open) projectDialog.close();
   document.body.classList.remove('modal-open');
-  if (location.hash.startsWith('#project/')) history.replaceState(null, '', location.pathname + location.search + '#work');
+  if (location.hash.startsWith('#project/')) history.replaceState(null, '', location.pathname + location.search + (currentProject?.id === 'love' ? '#love' : '#work'));
   if (lastFocus instanceof HTMLElement) lastFocus.focus({preventScroll:true});
 }
 function route() {
   if (location.hash.startsWith('#project/')) {
     let id;
     try { id = decodeURIComponent(location.hash.slice(9)); } catch { closeProject(); return; }
-    if (projects.some(project => project.id === id)) showProject(id);
+    if (detailProjects.some(project => project.id === id)) showProject(id);
     else closeProject();
   } else if (projectDialog.open) closeProject();
 }
@@ -82,6 +89,16 @@ function displayImage(index) {
   const images = currentProject.images;
   currentImage = (index + images.length) % images.length;
   const art = images[currentImage];
+  const cropView = document.querySelector('#lightbox-crop');
+  const plainImage = document.querySelector('#lightbox-image');
+  cropView.hidden = !art.crop;
+  plainImage.hidden = Boolean(art.crop);
+  if (art.crop) {
+    cropView.style.setProperty('--crop-ratio', art.width / art.height);
+    cropView.innerHTML = imgTag(art);
+  } else {
+    cropView.replaceChildren();
+  }
   document.querySelector('#lightbox-image').src = art.src;
   document.querySelector('#lightbox-image').alt = art.alt;
   document.querySelector('#lightbox-image').style.backgroundColor = art.background || '';
@@ -98,7 +115,7 @@ document.querySelector('.lightbox-close').addEventListener('click', () => lightb
 document.querySelector('.lightbox-prev').addEventListener('click', () => displayImage(currentImage - 1));
 document.querySelector('.lightbox-next').addEventListener('click', () => displayImage(currentImage + 1));
 lightbox.addEventListener('keydown', event => { if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') { event.preventDefault(); displayImage(currentImage + (event.key === 'ArrowLeft' ? -1 : 1)); } });
-for (const [selector, direction] of [['#previous-project', -1], ['#next-project', 1]]) document.querySelector(selector).addEventListener('click', () => { const index = projects.indexOf(currentProject); location.hash = `project/${projects[(index + direction + projects.length) % projects.length].id}`; });
+for (const [selector, direction] of [['#previous-project', -1], ['#next-project', 1]]) document.querySelector(selector).addEventListener('click', () => { const index = detailProjects.indexOf(currentProject); location.hash = `project/${detailProjects[(index + direction + detailProjects.length) % detailProjects.length].id}`; });
 window.addEventListener('hashchange', route);
 route();
 

@@ -1,0 +1,5 @@
+/* The approved photographs stay intact, with live text outside their crop windows. */
+.image-crop{display:block;position:relative;width:100%;overflow:hidden;background:#f8dfe5}
+.image-crop img{position:absolute;max-width:none!important;max-height:none!important;width:var(--image-width)!important;height:auto!important;left:var(--image-left);top:var(--image-top);object-fit:initial!important}
+#lightbox-crop{flex:none;width:min(100%,calc((100dvh - 190px) * var(--crop-ratio)));margin-inline:auto}
+#lightbox-crop[hidden],#lightbox-image[hidden]{display:none}

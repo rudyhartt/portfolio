@@ -14,6 +14,8 @@ The closing **Afterimage** chapter follows Hyperdream and introduces the final s
 
 The 21-file `artist.zip` adds four presentation visuals and eight clearly labelled process fragments in **Elsewhere** and **Notes, marks & fragments**. Eight large artwork exports are alternate-resolution copies of compositions already shown, and the movie is an exact duplicate of the existing WAOW!! film; these are represented once. `window.ARTIST_SOURCE_MAP` accounts for all 21 filenames. Transparent process images use neutral display backgrounds without altering their pixels.
 
+The **LOVE** feature follows the complete index and precedes About. Its light-pink layout presents three approved views — Presence, Objects and Character — with an **Explore LOVE** gallery. These AI-assisted product concept studies explore a fictional companion and accompanying objects; they are not photographs of working hardware. The three image windows use the approved preview artwork with native HTML headings and captions.
+
 A buildless static website with category filtering, deep links to projects, keyboard-accessible artwork viewers, native video playback, an about section and a closing portfolio sign-off. No framework, third-party scripts, tracking, backend or paid service is required.
 
 GitHub Pages serves the root of `main`. This repository intentionally has no CNAME or custom domain configuration. It is independent of all other repositories and websites.
@@ -29,12 +31,15 @@ The original design is preserved on the [V1 branch](https://github.com/rudyhartt
 - `immersive.css`: the original three-world layout and responsive typography.
 - `cut-through.css`: sharper cuts, new collage interlude and featured pool work.
 - `afterimage.css`: the grayscale closing chapter and uncropped featured artwork.
+- `love.css`: the light-pink LOVE feature and responsive three-shot layout.
+- `love-project.js`: LOVE project details and the three approved image regions.
 - `style.css`: shared base styles, project dialogs and artwork viewer.
 - `app.js`: filters, project dialogs, image viewer and hash navigation.
 - `assets/`: optimised WebP images, H.264 MP4 films and a DejaVu Sans Bold display-font subset (`display.woff`, with `FONT-LICENSE.txt`).
 - `assets/world-{paper,cut-through,electric,hyperdream,afterimage}.webp`: current collage panoramas with responsive variants.
 - `assets/pool/`: web-optimized pool images, thumbnails, films and posters. Four sensitive source images are represented only by their approved blurred derivatives.
 - `assets/artist/`: twelve additional presentation/process images and cover thumbnails, preserving original colour and transparency.
+- `assets/love/approved-study.webp`: the approved LOVE composition used for its three product-shot image windows.
 - `source-assets.csv`: a mapping back to original supplied asset filenames.
 
 To add a project, add an entry to `window.PORTFOLIO_PROJECTS` in `projects.js`, include its assets, and choose an existing filter category. Gallery artwork is displayed without cropping; cover images are cropped for presentation.

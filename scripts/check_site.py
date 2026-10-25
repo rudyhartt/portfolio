@@ -17,6 +17,16 @@ artist_projects = projects[25:]
 assert projects[:13] == original_projects, "Original project data changed"
 project_ids = {p["id"] for p in projects}
 assert len(project_ids) == len(projects), "Duplicate project IDs"
+love = json.loads(subprocess.check_output(["node", "-e", "global.window={};require('./love-project.js');process.stdout.write(JSON.stringify(window.LOVE_PROJECT));"], cwd=ROOT))
+assert love["id"] == "love" and love["id"] not in project_ids
+assert len(love["images"]) == 3 and "concept" in love["note"].lower()
+project_ids.add(love["id"])
+for art in love["images"]:
+    crop = art["crop"]
+    assert art["alt"] and art["width"] == crop["width"] and art["height"] == crop["height"]
+    assert 0 <= crop["x"] < crop["x"] + crop["width"] <= crop["sourceWidth"]
+    assert 0 <= crop["y"] < crop["y"] + crop["height"] <= crop["sourceHeight"]
+assert len({(art["crop"]["x"], art["crop"]["y"]) for art in love["images"]}) == 3
 assert len(original_projects) == 13, "The original 13 project galleries must remain"
 assert sum(len(p["images"]) for p in original_projects) == 55, "Original artwork missing"
 assert sum(len(p.get("videos", [])) for p in original_projects) == 2, "Original film missing"
@@ -41,6 +51,7 @@ for project_id, source, title in artist_meta["featured"]:
     project = next(p for p in artist_projects if p["id"] == project_id)
     assert source in {a["src"] for a in project["images"]} and title, "Broken closing feature"
 assets = set()
+assets.update(art["src"] for art in love["images"])
 for project in projects:
     assert (project["images"] or project.get("videos")) and project["summary"] and project["title"]
     for image in [project["cover"], *project["images"]]:
@@ -114,6 +125,8 @@ assert page.ids["paper-riot"] < page.ids["cut-through"] < page.ids["electric-pla
 positions = [page.ids[chapter] for chapter in chapters]
 assert positions == sorted(positions), "Visual worlds are out of order"
 assert page.ids["hyperdream"] < page.ids["afterimage"] < page.ids["archive"], "Closing chapter is out of order"
+assert page.ids["archive"] < page.ids["love"] < page.ids["about"], "LOVE must follow All the work and precede About"
+assert "lightbox-crop" in page.ids, "Missing cropped artwork enlargement view"
 featured = set()
 for start, end in zip(positions, positions[1:]):
     interlude = {project_id for position, project_id in page.project_links if start < position < end}
@@ -141,5 +154,7 @@ for asset in assets:
 html = (ROOT / "index.html").read_text()
 assert "Independent creative practice / Worldwide" in html and "<span>WORLDWIDE</span>" in html
 assert "LONDON, UK" not in html and "practice / London" not in html
+assert "mailto:" not in html and "rudyhartt@" not in html, "Public email must stay removed"
+assert "assets/world-paper.webp" in html and "world-paper-skate" not in html, "Keep the original ribbon banner"
 print(f"PASS: 100 pool sources and 21 artist sources accounted for, four chapters in order, one H1/navigation, {len(featured)} original featured projects, "
-      f"{len(projects)} galleries, {len(assets)} local assets and no custom domain.")
+      f"{len(projects)} index galleries plus three LOVE studies, {len(assets)} local assets and no custom domain.")

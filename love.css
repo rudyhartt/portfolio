@@ -1,0 +1,23 @@
+/* The approved LOVE study, with native text and three precise image windows. */
+.love-section{background:#f8dfe5;color:#10100f;padding:58px clamp(20px,3vw,64px) 34px;margin-bottom:72px;scroll-margin-top:24px}
+.love-heading{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:end;gap:30px;margin-bottom:32px}
+.love-heading .eyebrow{font-size:11px;letter-spacing:.28em;line-height:1.7}
+.love-heading h2{font-family:Display,Arial,sans-serif;font-size:clamp(88px,12.4vw,208px);font-weight:900;letter-spacing:-.075em;line-height:.85;margin:17px 0 0 -.055em}
+.love-intro{text-align:right;font-family:Georgia,'Times New Roman',serif;padding-bottom:3px}
+.love-intro p{font-size:clamp(24px,2.65vw,42px);letter-spacing:-.045em;line-height:1.08}
+.love-intro span{display:block;font-size:clamp(14px,1.4vw,21px);line-height:1.45;margin-top:7px}
+.love-shots{display:grid;grid-template-columns:minmax(0,592fr) minmax(0,432fr) minmax(0,400fr);gap:12px;align-items:start}
+.love-shot{display:block;min-width:0}
+.love-shot figure{margin:0}
+.love-shot-image{position:relative;display:block;width:100%;aspect-ratio:var(--shot-ratio);overflow:hidden;background:#e9bfc0}
+.love-shot-image>img{position:absolute;max-width:none;width:var(--shot-width);height:auto;left:var(--shot-left);top:var(--shot-top);margin:0;object-fit:fill}
+.love-shot figcaption{padding-top:13px;font-size:12px;letter-spacing:.1em;line-height:1.5}
+.love-shot:hover figcaption{text-decoration:underline;text-underline-offset:4px}
+.love-bottom{display:flex;align-items:baseline;justify-content:space-between;gap:25px;border-top:1px solid #77706f;margin-top:44px;padding-top:18px}
+.love-bottom p{font-size:10px;letter-spacing:.13em;line-height:1.6}
+.love-bottom a{font-size:13px;line-height:1.6;white-space:nowrap}
+.love-bottom a:hover{text-decoration:underline;text-underline-offset:5px}
+.love-bottom a span{margin-left:3px}
+.love-section a:focus-visible{outline-color:#684e58;outline-offset:6px}
+@media(max-width:900px){.love-section{padding-top:42px;margin-bottom:55px}.love-heading{gap:24px;margin-bottom:27px}.love-heading .eyebrow{font-size:9px;letter-spacing:.15em}.love-intro p{font-size:clamp(24px,3.1vw,30px)}.love-intro span{font-size:13px}.love-shots{gap:10px}.love-shot figcaption{font-size:10px;letter-spacing:.06em}.love-bottom{margin-top:32px}}
+@media(max-width:600px){.love-section{padding-top:36px;padding-bottom:28px;margin-bottom:44px}.love-heading{grid-template-columns:minmax(0,1fr);gap:24px;margin-bottom:26px}.love-heading .eyebrow{font-size:10px;letter-spacing:.2em}.love-heading h2{font-size:clamp(86px,26vw,150px);margin-top:17px;line-height:.82}.love-intro{text-align:left}.love-intro p{font-size:30px;max-width:340px}.love-intro span{font-size:15px;line-height:1.5;margin-top:9px}.love-shots{grid-template-columns:minmax(0,1fr);gap:28px}.love-shot figcaption{font-size:11px;letter-spacing:.1em;padding-top:11px}.love-bottom{margin-top:34px;padding-top:16px;align-items:start;gap:18px}.love-bottom p{max-width:175px;font-size:9px;letter-spacing:.1em}.love-bottom a{font-size:12px}}

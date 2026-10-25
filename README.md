@@ -4,7 +4,7 @@ A responsive portfolio of 27 curated collections, combining the original NewPort
 
 ## Site
 
-https://rudyhartt.github.io/portfolio/
+https://meet-love.com/
 
 The portfolio keeps the original visual worlds in sequence: **Paper Riot → Electric Playground → Hyperdream → Afterimage**. Eight featured original projects sit between the first three worlds, under one RUDY HARTT masthead and one main navigation. The hero uses the original twisting graphic ribbon collage, restored before the skateboard edits. The **Cut Through** collage banner and four featured collections connect Paper Riot to Electric Playground, with two more featured collections before Hyperdream. Deeper cutouts run through the artwork and page transitions. The public location label is Worldwide.
 
@@ -18,7 +18,7 @@ The **LOVE** feature follows the complete index and precedes About. Its light-pi
 
 A buildless static website with category filtering, deep links to projects, keyboard-accessible artwork viewers, native video playback, an about section and a closing portfolio sign-off. No framework, third-party scripts, tracking, backend or paid service is required.
 
-GitHub Pages serves the root of `main`. This repository intentionally has no CNAME or custom domain configuration. It is independent of all other repositories and websites.
+GitHub Pages serves the root of `main`. The root `CNAME` file binds this portfolio to `meet-love.com`. GoDaddy DNS should point the apex to GitHub Pages using A records `185.199.108.153`, `185.199.109.153`, `185.199.110.153` and `185.199.111.153`; `www` should be a CNAME to `rudyhartt.github.io`. This configuration is independent of `rudyhartt.com`, `symb10.com` and their repositories.
 
 The original design is preserved on the [V1 branch](https://github.com/rudyhartt/portfolio/tree/V1), at commit [`102b4fec8bdb5e9458d3a804ce076d67b3cb0a80`](https://github.com/rudyhartt/portfolio/tree/102b4fec8bdb5e9458d3a804ce076d67b3cb0a80).
 

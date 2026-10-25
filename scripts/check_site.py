@@ -132,7 +132,7 @@ for stylesheet in page.stylesheets:
     for match in re.finditer(r"url\(\s*(['\"]?)(.*?)\1\s*\)", css, re.IGNORECASE):
         add_asset(match.group(2), css_path.parent)
 
-for world in ("paper-skate", "cut-through", "electric", "hyperdream", "afterimage"):
+for world in ("paper", "cut-through", "electric", "hyperdream", "afterimage"):
     assets.update({f"assets/world-{world}.webp", f"assets/world-{world}-small.webp"})
 
 for asset in assets:

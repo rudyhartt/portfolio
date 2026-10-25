@@ -6,7 +6,7 @@ A responsive portfolio of 27 curated collections, combining the original NewPort
 
 https://rudyhartt.github.io/portfolio/
 
-V4 keeps the original visual worlds in sequence: **Paper Riot → Electric Playground → Hyperdream → Afterimage**. Eight featured original projects sit between the first three worlds, under one RUDY HARTT masthead and one main navigation. The hero ends in a twisting skateboard deck. The **Cut Through** collage banner and four featured collections connect Paper Riot to Electric Playground, with two more featured collections before Hyperdream. Deeper cutouts run through the artwork and page transitions. The public location label is Worldwide.
+The portfolio keeps the original visual worlds in sequence: **Paper Riot → Electric Playground → Hyperdream → Afterimage**. Eight featured original projects sit between the first three worlds, under one RUDY HARTT masthead and one main navigation. The hero uses the original twisting graphic ribbon collage, restored before the skateboard edits. The **Cut Through** collage banner and four featured collections connect Paper Riot to Electric Playground, with two more featured collections before Hyperdream. Deeper cutouts run through the artwork and page transitions. The public location label is Worldwide.
 
 The panoramas are AI-assisted collage interpretations of the supplied artwork. Gallery media retains the supplied work, using approved localized-blur copies in four cases. The 100 uploaded pool files resolve to 90 distinct stills and four distinct clips; six exact duplicate pairs are represented once, with every original filename retained in `sourceFiles` metadata.
 
@@ -14,7 +14,7 @@ The closing **Afterimage** chapter follows Hyperdream and introduces the final s
 
 The 21-file `artist.zip` adds four presentation visuals and eight clearly labelled process fragments in **Elsewhere** and **Notes, marks & fragments**. Eight large artwork exports are alternate-resolution copies of compositions already shown, and the movie is an exact duplicate of the existing WAOW!! film; these are represented once. `window.ARTIST_SOURCE_MAP` accounts for all 21 filenames. Transparent process images use neutral display backgrounds without altering their pixels.
 
-A buildless static website with category filtering, deep links to projects, keyboard-accessible artwork viewers, native video playback, an about section and email contact. No framework, third-party scripts, tracking, backend or paid service is required.
+A buildless static website with category filtering, deep links to projects, keyboard-accessible artwork viewers, native video playback, an about section and a closing portfolio sign-off. No framework, third-party scripts, tracking, backend or paid service is required.
 
 GitHub Pages serves the root of `main`. This repository intentionally has no CNAME or custom domain configuration. It is independent of all other repositories and websites.
 
@@ -22,7 +22,7 @@ The original design is preserved on the [V1 branch](https://github.com/rudyhartt
 
 ## Editing
 
-- `index.html`: four-chapter sequence, featured projects, biography, contact details and metadata.
+- `index.html`: four-chapter sequence, featured projects, biography, closing sign-off and metadata.
 - `projects.js`: the original 13 project galleries, preserved.
 - `pool-projects.js`: 12 new curated collections, descriptive captions, source-file mappings and four new films.
 - `artist-projects.js`: two closing collections, featured selections and artist-archive duplicate mapping.
@@ -32,7 +32,7 @@ The original design is preserved on the [V1 branch](https://github.com/rudyhartt
 - `style.css`: shared base styles, project dialogs and artwork viewer.
 - `app.js`: filters, project dialogs, image viewer and hash navigation.
 - `assets/`: optimised WebP images, H.264 MP4 films and a DejaVu Sans Bold display-font subset (`display.woff`, with `FONT-LICENSE.txt`).
-- `assets/world-{paper-skate,cut-through,electric,hyperdream,afterimage}.webp`: current collage panoramas with responsive variants.
+- `assets/world-{paper,cut-through,electric,hyperdream,afterimage}.webp`: current collage panoramas with responsive variants.
 - `assets/pool/`: web-optimized pool images, thumbnails, films and posters. Four sensitive source images are represented only by their approved blurred derivatives.
 - `assets/artist/`: twelve additional presentation/process images and cover thumbnails, preserving original colour and transparency.
 - `source-assets.csv`: a mapping back to original supplied asset filenames.
@@ -45,7 +45,7 @@ For local preview, serve this directory with any static HTTP server, for example
 
 Project groupings and descriptions were prepared from the supplied artwork and professional background documents. Unverified commissions are not presented as client relationships. Studio Ghibli is labelled as an independent concept. Existing brand and character rights remain with their respective owners.
 
-The original ZIP, Pages document and profile/CV PDFs are not published. The biography draws on the professional documents; the public contact uses the supplied professional email. Unused institutional logos are excluded from the deployed assets.
+The original ZIP, Pages document and profile/CV PDFs are not published. The biography draws on the professional documents. The public email address and email links have been removed at the artist’s request. Unused institutional logos are excluded from the deployed assets.
 
 ## Validation
 

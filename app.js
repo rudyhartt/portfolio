@@ -77,3 +77,17 @@ lightbox.addEventListener('keydown', event => { if (event.key === 'ArrowLeft' ||
 for (const [selector, direction] of [['#previous-project', -1], ['#next-project', 1]]) document.querySelector(selector).addEventListener('click', () => { const index = projects.indexOf(currentProject); location.hash = `project/${projects[(index + direction + projects.length) % projects.length].id}`; });
 window.addEventListener('hashchange', route);
 route();
+
+// A subtle reading line links the three chapters without adding another nav.
+const readingLine = document.querySelector('.reading-line');
+let progressQueued = false;
+function updateProgress() {
+  const travel = document.documentElement.scrollHeight - window.innerHeight;
+  if (readingLine) readingLine.style.width = `${travel > 0 ? Math.min(100, window.scrollY / travel * 100) : 0}%`;
+  progressQueued = false;
+}
+window.addEventListener('scroll', () => {
+  if (!progressQueued) { progressQueued = true; requestAnimationFrame(updateProgress); }
+}, {passive:true});
+window.addEventListener('resize', updateProgress);
+updateProgress();

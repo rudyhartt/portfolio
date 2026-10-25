@@ -1,6 +1,7 @@
-"""Validate the V2 structure, retained catalogue and local asset references."""
+"""Validate collage structure, original catalogue and new source coverage."""
 import json
 import re
+import subprocess
 from pathlib import Path
 from html.parser import HTMLParser
 from urllib.parse import unquote, urlsplit
@@ -8,15 +9,27 @@ from urllib.parse import unquote, urlsplit
 ROOT = Path(__file__).resolve().parents[1]
 raw = (ROOT / "projects.js").read_text()
 projects = json.loads(raw.split("=", 1)[1].strip().removesuffix(";"))
+original_projects = projects
+node_script = "global.window = {}; require('./projects.js'); require('./pool-projects.js'); process.stdout.write(JSON.stringify(window.PORTFOLIO_PROJECTS));"
+projects = json.loads(subprocess.check_output(["node", "-e", node_script], cwd=ROOT))
+new_projects = projects[len(original_projects):]
+assert projects[:13] == original_projects, "Original project data changed"
 project_ids = {p["id"] for p in projects}
 assert len(project_ids) == len(projects), "Duplicate project IDs"
-assert len(projects) == 13, "The original 13 project galleries must remain"
-assert sum(len(p["images"]) for p in projects) == 55, "Original artwork missing"
-assert sum(len(p.get("videos", [])) for p in projects) == 2, "Original film missing"
+assert len(original_projects) == 13, "The original 13 project galleries must remain"
+assert sum(len(p["images"]) for p in original_projects) == 55, "Original artwork missing"
+assert sum(len(p.get("videos", [])) for p in original_projects) == 2, "Original film missing"
 assert not (ROOT / "CNAME").exists(), "Unexpected custom domain configuration"
+assert len(new_projects) == 12, "Missing new collections"
+assert sum(len(p["images"]) for p in new_projects) == 90, "Unique new still missing"
+assert sum(len(p.get("videos", [])) for p in new_projects) == 4, "Unique new video missing"
+new_items = [art for p in new_projects for art in p["images"] + p.get("videos", [])]
+source_files = [name for art in new_items for name in art["sourceFiles"]]
+assert len(source_files) == len(set(source_files)) == 100, "Every source must be accounted for exactly once"
+assert len({art["src"] for art in new_items}) == 94, "Duplicate item in public galleries"
 assets = set()
 for project in projects:
-    assert project["images"] and project["summary"] and project["title"]
+    assert (project["images"] or project.get("videos")) and project["summary"] and project["title"]
     for image in [project["cover"], *project["images"]]:
         assert image["alt"] and image["width"] > 0 and image["height"] > 0
         assets.update([image["src"], image["thumb"]] if image == project["cover"] else [image["src"]])
@@ -84,6 +97,7 @@ assert page.h1_count == 1, "Use one portfolio H1"
 assert page.nav_count == 1, "Use one main navigation"
 chapters = ["paper-riot", "electric-playground", "hyperdream"]
 assert all(chapter in page.ids for chapter in chapters), "Missing a visual world"
+assert page.ids["paper-riot"] < page.ids["cut-through"] < page.ids["electric-playground"], "Collage interlude must sit between first and second worlds"
 positions = [page.ids[chapter] for chapter in chapters]
 assert positions == sorted(positions), "Visual worlds are out of order"
 featured = set()
@@ -104,11 +118,14 @@ for stylesheet in page.stylesheets:
     for match in re.finditer(r"url\(\s*(['\"]?)(.*?)\1\s*\)", css, re.IGNORECASE):
         add_asset(match.group(2), css_path.parent)
 
-for world in ("paper", "electric", "hyperdream"):
+for world in ("paper-skate", "cut-through", "electric", "hyperdream"):
     assets.update({f"assets/world-{world}.webp", f"assets/world-{world}-small.webp"})
 
 for asset in assets:
     path = ROOT / asset
     assert path.is_file() and path.stat().st_size > 0, f"Missing or empty: {asset}"
-print(f"PASS: three worlds in order, one H1/navigation, {len(featured)} featured projects, "
+html = (ROOT / "index.html").read_text()
+assert "Independent creative practice / Worldwide" in html and "<span>WORLDWIDE</span>" in html
+assert "LONDON, UK" not in html and "practice / London" not in html
+print(f"PASS: 100 new sources in 12 collections, three worlds in order, one H1/navigation, {len(featured)} featured projects, "
       f"{len(projects)} galleries, {len(assets)} local assets and no custom domain.")

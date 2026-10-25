@@ -12,6 +12,28 @@ const imgTag = (art, thumbnail = false) => `<img src="${escapeHTML(thumbnail ? a
 
 document.querySelector('#year').textContent = new Date().getFullYear();
 document.querySelector('#total-count').textContent = String(projects.length).padStart(2, '0');
+const artworkCount = projects.reduce((total, project) => total + project.images.length + (project.videos || []).length, 0);
+document.querySelector('#archive-summary').textContent = `${projects.length} collections / ${artworkCount} works / open a gallery`;
+function renderFeaturedWork(selector, selections) {
+  const container = document.querySelector(selector);
+  if (!container) return;
+  container.innerHTML = selections.map(([id, source, title]) => {
+    const project = projects.find(item => item.id === id);
+    if (!project) return '';
+    const art = project.images.find(item => item.src === source) || project.cover;
+    return `<a class="feature" href="#project/${escapeHTML(id)}" aria-label="View ${escapeHTML(project.title)}"><figure><div class="feature-art">${imgTag(art)}</div><figcaption><div><h3>${escapeHTML(title)}</h3><p>${escapeHTML(project.subtitle)}</p></div><span class="feature-arrow" aria-hidden="true">↗</span></figcaption></figure></a>`;
+  }).join('');
+}
+renderFeaturedWork('#new-work-grid', [
+  ['pool-collage-studies', 'assets/pool/b3-1.webp', 'Pop collisions.'],
+  ['pool-objects-with-personality', 'assets/pool/6n-7.webp', 'Small things. Big personalities.'],
+  ['pool-pop-fizz', 'assets/pool/7z-9.webp', 'Pop, fizz & colour.'],
+  ['pool-character-cast', 'assets/pool/6b-1.webp', 'A cast of characters.']
+]);
+renderFeaturedWork('#new-motion-grid', [
+  ['pool-future-faces', 'assets/pool/7z-8.webp', 'Future faces.'],
+  ['pool-printed-imaginations', 'assets/pool/7j-6.webp', 'Printed imaginations.']
+]);
 grid.innerHTML = projects.map((project, i) => `<article class="project-card" data-category="${escapeHTML(project.category)}"><a href="#project/${project.id}" aria-label="View ${escapeHTML(project.title)}"><div class="project-cover">${imgTag(project.cover, true)}<span class="project-category">${escapeHTML(project.category)}</span><span class="project-open" aria-hidden="true">↗</span></div><div class="project-info"><h3>${escapeHTML(project.title)}</h3><span>${String(i + 1).padStart(2, '0')} / ${String(projects.length).padStart(2, '0')}</span></div><p class="project-subtitle">${escapeHTML(project.subtitle)}</p></a></article>`).join('');
 const availableFilters = filters.filter(category => category === 'All work' || projects.some(p => p.category === category));
 document.querySelector('.filters').innerHTML = availableFilters.map((category, i) => `<button type="button" aria-pressed="${i === 0}" data-filter="${escapeHTML(category)}">${escapeHTML(category)}</button>`).join('');

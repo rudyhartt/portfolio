@@ -19,14 +19,13 @@ project_ids = {p["id"] for p in projects}
 assert len(project_ids) == len(projects), "Duplicate project IDs"
 love = json.loads(subprocess.check_output(["node", "-e", "global.window={};require('./love-project.js');process.stdout.write(JSON.stringify(window.LOVE_PROJECT));"], cwd=ROOT))
 assert love["id"] == "love" and love["id"] not in project_ids
-assert len(love["images"]) == 3 and "concept" in love["note"].lower()
+assert len(love["images"]) == 4 and "concept" in love["note"].lower()
 project_ids.add(love["id"])
 for art in love["images"]:
-    crop = art["crop"]
-    assert art["alt"] and art["width"] == crop["width"] and art["height"] == crop["height"]
-    assert 0 <= crop["x"] < crop["x"] + crop["width"] <= crop["sourceWidth"]
-    assert 0 <= crop["y"] < crop["y"] + crop["height"] <= crop["sourceHeight"]
-assert len({(art["crop"]["x"], art["crop"]["y"]) for art in love["images"]}) == 3
+    assert art["alt"] and art["width"] > 0 and art["height"] > 0
+    assert "crop" not in art, "New LOVE gallery images must be shown in full"
+    assert art["src"].startswith("assets/love/love-"), "LOVE gallery must use the new standalone images"
+assert len({art["src"] for art in love["images"]}) == 4, "LOVE gallery images must be distinct"
 assert len(original_projects) == 13, "The original 13 project galleries must remain"
 assert sum(len(p["images"]) for p in original_projects) == 55, "Original artwork missing"
 assert sum(len(p.get("videos", [])) for p in original_projects) == 2, "Original film missing"
@@ -157,4 +156,4 @@ assert "LONDON, UK" not in html and "practice / London" not in html
 assert "mailto:" not in html and "rudyhartt@" not in html, "Public email must stay removed"
 assert "assets/world-paper.webp" in html and "world-paper-skate" not in html, "Keep the original ribbon banner"
 print(f"PASS: 100 pool sources and 21 artist sources accounted for, four chapters in order, one H1/navigation, {len(featured)} original featured projects, "
-      f"{len(projects)} index galleries plus three LOVE studies, {len(assets)} local assets and no custom domain.")
+      f"{len(projects)} index galleries plus four LOVE studies, {len(assets)} local assets and no custom domain.")

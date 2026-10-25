@@ -10,9 +10,10 @@ ROOT = Path(__file__).resolve().parents[1]
 raw = (ROOT / "projects.js").read_text()
 projects = json.loads(raw.split("=", 1)[1].strip().removesuffix(";"))
 original_projects = projects
-node_script = "global.window = {}; require('./projects.js'); require('./pool-projects.js'); process.stdout.write(JSON.stringify(window.PORTFOLIO_PROJECTS));"
+node_script = "global.window = {}; require('./projects.js'); require('./pool-projects.js'); require('./artist-projects.js'); process.stdout.write(JSON.stringify(window.PORTFOLIO_PROJECTS));"
 projects = json.loads(subprocess.check_output(["node", "-e", node_script], cwd=ROOT))
-new_projects = projects[len(original_projects):]
+new_projects = projects[len(original_projects):25]
+artist_projects = projects[25:]
 assert projects[:13] == original_projects, "Original project data changed"
 project_ids = {p["id"] for p in projects}
 assert len(project_ids) == len(projects), "Duplicate project IDs"
@@ -27,6 +28,18 @@ new_items = [art for p in new_projects for art in p["images"] + p.get("videos", 
 source_files = [name for art in new_items for name in art["sourceFiles"]]
 assert len(source_files) == len(set(source_files)) == 100, "Every source must be accounted for exactly once"
 assert len({art["src"] for art in new_items}) == 94, "Duplicate item in public galleries"
+assert len(artist_projects) == 2, "Missing closing collections"
+assert sum(len(p["images"]) for p in artist_projects) == 12, "Missing artist presentation or process image"
+all_art = [art["src"] for p in projects for art in p["images"] + p.get("videos", [])]
+assert len(all_art) == len(set(all_art)), "Duplicate artwork added to the catalogue"
+artist_meta = json.loads(subprocess.check_output(["node", "-e", node_script.replace("JSON.stringify(window.PORTFOLIO_PROJECTS)", "JSON.stringify({sources:window.ARTIST_SOURCE_MAP,featured:window.ARTIST_FEATURED})")], cwd=ROOT))
+assert len(artist_meta["sources"]) == 21, "Artist ZIP coverage is incomplete"
+assert sum(item["status"] == "new" for item in artist_meta["sources"].values()) == 12
+assert sum(item["status"] == "existing" for item in artist_meta["sources"].values()) == 9
+assert all(item["src"] in all_art for item in artist_meta["sources"].values()), "Artist source points outside the catalogue"
+for project_id, source, title in artist_meta["featured"]:
+    project = next(p for p in artist_projects if p["id"] == project_id)
+    assert source in {a["src"] for a in project["images"]} and title, "Broken closing feature"
 assets = set()
 for project in projects:
     assert (project["images"] or project.get("videos")) and project["summary"] and project["title"]
@@ -100,6 +113,7 @@ assert all(chapter in page.ids for chapter in chapters), "Missing a visual world
 assert page.ids["paper-riot"] < page.ids["cut-through"] < page.ids["electric-playground"], "Collage interlude must sit between first and second worlds"
 positions = [page.ids[chapter] for chapter in chapters]
 assert positions == sorted(positions), "Visual worlds are out of order"
+assert page.ids["hyperdream"] < page.ids["afterimage"] < page.ids["archive"], "Closing chapter is out of order"
 featured = set()
 for start, end in zip(positions, positions[1:]):
     interlude = {project_id for position, project_id in page.project_links if start < position < end}
@@ -118,7 +132,7 @@ for stylesheet in page.stylesheets:
     for match in re.finditer(r"url\(\s*(['\"]?)(.*?)\1\s*\)", css, re.IGNORECASE):
         add_asset(match.group(2), css_path.parent)
 
-for world in ("paper-skate", "cut-through", "electric", "hyperdream"):
+for world in ("paper-skate", "cut-through", "electric", "hyperdream", "afterimage"):
     assets.update({f"assets/world-{world}.webp", f"assets/world-{world}-small.webp"})
 
 for asset in assets:
@@ -127,5 +141,5 @@ for asset in assets:
 html = (ROOT / "index.html").read_text()
 assert "Independent creative practice / Worldwide" in html and "<span>WORLDWIDE</span>" in html
 assert "LONDON, UK" not in html and "practice / London" not in html
-print(f"PASS: 100 new sources in 12 collections, three worlds in order, one H1/navigation, {len(featured)} featured projects, "
+print(f"PASS: 100 pool sources and 21 artist sources accounted for, four chapters in order, one H1/navigation, {len(featured)} original featured projects, "
       f"{len(projects)} galleries, {len(assets)} local assets and no custom domain.")

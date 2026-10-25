@@ -8,7 +8,7 @@ let currentProject = null;
 let currentImage = 0;
 let lastFocus = null;
 const escapeHTML = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const imgTag = (art, thumbnail = false) => `<img src="${escapeHTML(thumbnail ? art.thumb || art.src : art.src)}" alt="${escapeHTML(art.alt)}" width="${art.width}" height="${art.height}" loading="lazy" decoding="async">`;
+const imgTag = (art, thumbnail = false) => `<img src="${escapeHTML(thumbnail ? art.thumb || art.src : art.src)}" alt="${escapeHTML(art.alt)}" width="${art.width}" height="${art.height}"${art.background ? ` style="background-color:${escapeHTML(art.background)}"` : ''} loading="lazy" decoding="async">`;
 
 document.querySelector('#year').textContent = new Date().getFullYear();
 document.querySelector('#total-count').textContent = String(projects.length).padStart(2, '0');
@@ -34,6 +34,7 @@ renderFeaturedWork('#new-motion-grid', [
   ['pool-future-faces', 'assets/pool/7z-8.webp', 'Future faces.'],
   ['pool-printed-imaginations', 'assets/pool/7j-6.webp', 'Printed imaginations.']
 ]);
+renderFeaturedWork('#artist-feature-grid', window.ARTIST_FEATURED || []);
 grid.innerHTML = projects.map((project, i) => `<article class="project-card" data-category="${escapeHTML(project.category)}"><a href="#project/${project.id}" aria-label="View ${escapeHTML(project.title)}"><div class="project-cover">${imgTag(project.cover, true)}<span class="project-category">${escapeHTML(project.category)}</span><span class="project-open" aria-hidden="true">↗</span></div><div class="project-info"><h3>${escapeHTML(project.title)}</h3><span>${String(i + 1).padStart(2, '0')} / ${String(projects.length).padStart(2, '0')}</span></div><p class="project-subtitle">${escapeHTML(project.subtitle)}</p></a></article>`).join('');
 const availableFilters = filters.filter(category => category === 'All work' || projects.some(p => p.category === category));
 document.querySelector('.filters').innerHTML = availableFilters.map((category, i) => `<button type="button" aria-pressed="${i === 0}" data-filter="${escapeHTML(category)}">${escapeHTML(category)}</button>`).join('');
@@ -83,6 +84,7 @@ function displayImage(index) {
   const art = images[currentImage];
   document.querySelector('#lightbox-image').src = art.src;
   document.querySelector('#lightbox-image').alt = art.alt;
+  document.querySelector('#lightbox-image').style.backgroundColor = art.background || '';
   document.querySelector('#lightbox-caption').textContent = `${currentImage + 1} / ${images.length} — ${art.alt}`;
   document.querySelector('.lightbox-prev').disabled = images.length === 1;
   document.querySelector('.lightbox-next').disabled = images.length === 1;

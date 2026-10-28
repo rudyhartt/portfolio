@@ -23,7 +23,7 @@ Data loads in this order: `projects.js`, `pool-projects.js`, `artist-projects.js
 
 Serve this folder using any static server, such as `python -m http.server 8000`. Open `/` for the portfolio, or `/preview.html` for 390px and 768px responsive review frames. GitHub Pages uses the `main` branch and repository root.
 
-Click any still image to open it, use arrow keys to browse, and Escape to step back through the viewer. The index button and five chapter markers provide shortcuts through the long page.
+Click any still image in the collage to open it directly, use arrow keys to browse, and close or press Escape to return to the same place in the collage. Images opened from a collection gallery return to that gallery. Browser Back and Forward retain the direct-image view. The index button and five chapter markers provide shortcuts through the long page.
 
 ## Image provenance
 

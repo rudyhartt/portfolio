@@ -76,22 +76,27 @@
     index.querySelector('[data-close-index]').focus({preventScroll: true});
   }
 
-  function closeLightbox({focus = true} = {}) {
+  function restoreBackgroundURL() {
+    if (!location.hash.startsWith('#project/')) return;
+    if (history.state?.__rudyCollageGallery) history.back();
+    else history.replaceState(history.state, '', backgroundURL);
+  }
+
+  function closeLightbox({focus = true, updateURL = true} = {}) {
     if (!lightbox.open) return;
+    const standalone = !projectDialog.open;
     lightbox.close();
+    if (standalone && updateURL) restoreBackgroundURL();
     updateScrollLock();
-    if (focus) restoreFocus(imageReturnFocus, false);
+    if (focus) restoreFocus(imageReturnFocus);
   }
 
   function closeProject({updateURL = true, focus = true} = {}) {
-    if (!projectDialog.open) return;
-    closeLightbox({focus: false});
+    if (!projectDialog.open && !lightbox.open) return;
+    closeLightbox({focus: false, updateURL: false});
     pauseFilms();
     projectDialog.close();
-    if (updateURL && location.hash.startsWith('#project/')) {
-      if (history.state?.__rudyCollageGallery) history.back();
-      else history.replaceState(history.state, '', backgroundURL);
-    }
+    if (updateURL) restoreBackgroundURL();
     updateScrollLock();
     if (focus) {
       restoreFocus(projectReturnFocus);
@@ -111,7 +116,7 @@
     const project = projectById.get(id);
     if (!project) return;
     if (projectDialog.open && currentProject?.id === id) return;
-    closeLightbox({focus: false});
+    closeLightbox({focus: false, updateURL: false});
     pauseFilms();
     if (!projectDialog.open) projectReturnFocus = trigger;
     currentProject = project;
@@ -129,25 +134,39 @@
     const replacingProject = replace || location.hash.startsWith('#project/');
     if (!replacingProject) backgroundURL = location.pathname + location.search + location.hash;
     const url = location.pathname + location.search + '#project/' + encodeURIComponent(id);
-    if (location.hash !== '#project/' + encodeURIComponent(id)) {
+    if (location.hash !== '#project/' + encodeURIComponent(id) || history.state?.__rudyCollageGallery?.mode === 'image') {
       const state = history.state && typeof history.state === 'object' ? {...history.state} : {};
-      if (!replacingProject) state.__rudyCollageGallery = {backgroundURL};
+      if (!replacingProject || state.__rudyCollageGallery) state.__rudyCollageGallery = {backgroundURL};
       history[replacingProject ? 'replaceState' : 'pushState'](state, '', url);
     }
     showProject(id, trigger);
   }
 
-  function openWork(id, position, trigger = document.activeElement) {
+  function openWork(id, position, trigger = document.activeElement, {updateURL = true} = {}) {
     const project = projectById.get(id);
     if (!project || !Number.isInteger(position) || position < 0 || position >= (project.images?.length || 0)) return;
-    navigateProject(id, {trigger});
-    displayImage(position, projectDialog.querySelector(`[data-image="${position}"]`));
+    if (projectDialog.open) closeProject({updateURL: false, focus: false});
+    if (updateURL) {
+      const replacingProject = location.hash.startsWith('#project/');
+      if (!replacingProject) backgroundURL = location.pathname + location.search + location.hash;
+      const state = history.state && typeof history.state === 'object' ? {...history.state} : {};
+      state.__rudyCollageGallery = {backgroundURL, mode: 'image', projectId: id, imageIndex: position};
+      history[replacingProject ? 'replaceState' : 'pushState'](state, '', location.pathname + location.search + '#project/' + encodeURIComponent(id));
+    }
+    // Collage images open directly, without an unseen project gallery beneath them.
+    currentProject = project;
+    projectReturnFocus = trigger;
+    displayImage(position, trigger);
   }
 
   function displayImage(position, trigger = document.activeElement) {
     const images = currentProject?.images || [];
     if (!images.length) return;
     currentImage = (position + images.length) % images.length;
+    const galleryState = history.state?.__rudyCollageGallery;
+    if (!projectDialog.open && galleryState?.mode === 'image') {
+      history.replaceState({...history.state, __rudyCollageGallery: {...galleryState, imageIndex: currentImage}}, '', location.href);
+    }
     const art = images[currentImage];
     const fullImage = lightbox.querySelector('.gallery-full-image');
     fullImage.src = art.src;
@@ -171,8 +190,12 @@
     }
     let id;
     try { id = decodeURIComponent(location.hash.slice(9)); } catch { closeProject({updateURL: false}); return; }
-    if (projectById.has(id)) showProject(id);
-    else closeProject({updateURL: false});
+    if (!projectById.has(id)) { closeProject({updateURL: false}); return; }
+    const galleryState = history.state?.__rudyCollageGallery;
+    if (galleryState?.mode === 'image' && galleryState.projectId === id && Number.isInteger(galleryState.imageIndex)) {
+      const trigger = [...document.querySelectorAll('[data-open-work]')].find(link => link.dataset.openWork === `${id}:${galleryState.imageIndex}`) || imageReturnFocus;
+      openWork(id, galleryState.imageIndex, trigger, {updateURL: false});
+    } else showProject(id);
   }
 
   document.addEventListener('click', event => {

@@ -150,7 +150,8 @@
       const replacingProject = location.hash.startsWith('#project/');
       if (!replacingProject) backgroundURL = location.pathname + location.search + location.hash;
       const state = history.state && typeof history.state === 'object' ? {...history.state} : {};
-      state.__rudyCollageGallery = {backgroundURL, mode: 'image', projectId: id, imageIndex: position};
+      const sourceWork = trigger?.dataset?.openWork || `${id}:${position}`;
+      state.__rudyCollageGallery = {backgroundURL, mode: 'image', projectId: id, imageIndex: position, sourceWork};
       history[replacingProject ? 'replaceState' : 'pushState'](state, '', location.pathname + location.search + '#project/' + encodeURIComponent(id));
     }
     // Collage images open directly, without an unseen project gallery beneath them.
@@ -193,7 +194,8 @@
     if (!projectById.has(id)) { closeProject({updateURL: false}); return; }
     const galleryState = history.state?.__rudyCollageGallery;
     if (galleryState?.mode === 'image' && galleryState.projectId === id && Number.isInteger(galleryState.imageIndex)) {
-      const trigger = [...document.querySelectorAll('[data-open-work]')].find(link => link.dataset.openWork === `${id}:${galleryState.imageIndex}`) || imageReturnFocus;
+      const sourceWork = galleryState.sourceWork || `${id}:${galleryState.imageIndex}`;
+      const trigger = [...document.querySelectorAll('[data-open-work]')].find(link => link.dataset.openWork === sourceWork) || imageReturnFocus;
       openWork(id, galleryState.imageIndex, trigger, {updateURL: false});
     } else showProject(id);
   }
